@@ -5,14 +5,15 @@ const authorize = require('../../middleware/auth')
 const Authentication_attempts = require('../../models/Authentication_attempts')
 const authorization = require('../../middleware/authorization')
 
-router.post('/users', sanitizeBody, async (req, res) => {
+router.post('/users', sanitizeBody, async (req, res, next) => {
     new User(req.sanitizedBody)
     .save()
     .then(newUser => res.status(201).send({data: newUser}))
     .catch(next)
 })
 
-router.post('/tokens', sanitizeBody, async(req,res)=>{
+router.post('/tokens', sanitizeBody, async(req,res, next)=>{
+  try{
   const { email, password } = req.sanitizedBody
   const user = await User.authenticate(email, password)
   let didSucceed = false;
@@ -36,12 +37,18 @@ router.post('/tokens', sanitizeBody, async(req,res)=>{
       ]})
   }
   res.status(201).send({data:{token: user.generateAuthToken()}})
-  console.log(req);
+  }catch(err){
+    next(err);
+  }
 })
 
-router.get('/users/me', authorize, async (req, res) => {
+router.get('/users/me', authorize, async (req, res, next) => {
+  try{
     const user = await User.findById(req.user._id)
     res.send({data: user})
+  } catch(err){
+    next(err)
+  }
 })
 
 router.patch('/users/me', authorize, sanitizeBody, async (req, res, next)=>{
