@@ -46,7 +46,7 @@ router.patch('/:id', authAdmin, sanitizeBody, async (req, res) => {
     }
 })
 
-router.put('/:id', authAdmin. sanitizeBody, async(req, res) => {
+router.put('/:id', authAdmin, sanitizeBody, async (req, res) => {
     try{
         const {_id, ...otherAttributes} = req.santizedBody
         const ingredient = await Ingredients.findByIdAndUpdate(
