@@ -11,7 +11,18 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try{
-        const pizza = await Pizzas.findById(req.params.id).populate('ingredients').populate('extraToppings')
+        let pizza = await Pizzas.findById(req.params.id).populate('ingredients').populate('extraToppings')
+        
+        if(req.query.instock){
+            pizza = pizza.filter(pizza => {
+                if(pizza.ingredients.find(ingredient => ingredient.quantity = 0)){
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+        }
+
         if(!pizza) throw new Error('Resource not found')
         res.send({ data: pizza })
     } catch (err){

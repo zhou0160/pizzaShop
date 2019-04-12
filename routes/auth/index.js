@@ -14,9 +14,9 @@ router.post('/users', sanitizeBody, async (req, res, next) => {
 
 router.post('/tokens', sanitizeBody, async(req,res, next)=>{
   try{
-  const { email, password } = req.sanitizedBody
-  const user = await User.authenticate(email, password)
-  let didSucceed = false;
+    const { email, password } = req.sanitizedBody
+    const user = await User.authenticate(email, password)
+    let didSucceed = false;
   if(user){
     didSucceed = true;
   }

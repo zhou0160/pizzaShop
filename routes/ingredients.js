@@ -11,18 +11,21 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try{
-        const ingredients = await Ingredients.findById(req.params.id)
+        let ingredients = await Ingredients.findById(req.params.id)
+        if(req.query.instock){
+            ingredients = ingredients.filter(ingredient => ingredient.quantity > 0)
+        }
         if(!ingredients) throw new Error('Resource not found')
         res.send({ data: ingredients})
+
     } catch (err) {
         sendResourceNotFound(req, res)
     }
 })
 
 router.post('/', authAdmin, sanitizeBody, async (req, res) => {
-    let newIngredient = new Ingredients(req.santizedBody)
+    const newIngredient = new Ingredients(req.santizedBody)
     await newIngredient.save()
-
     res.status(201).send({ data: newIngredient })
 })
 
