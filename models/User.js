@@ -85,10 +85,10 @@ schema.pre('save', async function (next) {
     next()
 })
 
-schema.post('findByIdAndUpdate', function(doc, next){
-    doc.save();
-    next();
-})
+// schema.post('findByIdAndUpdate', function(doc, next){
+//     doc.save();
+//     next();
+// })
 
 const Model = mongoose.model('User', schema)
 

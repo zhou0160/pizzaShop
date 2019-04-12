@@ -46,14 +46,9 @@ router.get('/users/me', authorize, async (req, res) => {
 
 router.patch('/users/me', authorize, sanitizeBody, async (req, res, next)=>{
   try{
-    const user = await User.findByIdAndUpdate(
-        req.user._id,
-        {password: req.sanitizedBody.password},
-        {
-            new: true,
-            runValidators: true
-        }
-    )
+    let user = await User.findById(req.user._id)
+    user.password = req.sanitizedBody.password
+    user.save()
     res.send({data: user})
   } catch(err){
     next(err)

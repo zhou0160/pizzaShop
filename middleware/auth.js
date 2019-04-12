@@ -1,8 +1,18 @@
 const jwt = require('jsonwebtoken')
 const jwtPrivateKey = 'superSecureSecret'
 
+function parseToken(header){
+    if(header){
+       const [type, token] = header.split(" ")
+       if(type == 'Bearer' && typeof token !== 'undefined'){
+           return token
+       } 
+       return undefined
+    }
+}
+
 module.exports = (req, res, next) => {
-    const token = req.header('bearer')
+    const token = parseToken(req.header('Authorization'))
     if (!token) {
         return res.status(401).send({
             errors: [{
