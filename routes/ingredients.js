@@ -54,7 +54,7 @@ router.patch('/:id', auth, authAdmin, sanitizeBody, async (req, res, next) => {
             }
         )
         if (!ingredient) throw new ResourceNotFoundError('Resource not found')
-        res.send({ data: student })
+        res.send({ data: ingredient })
     } catch (err){
         next(err)
     }
@@ -84,7 +84,7 @@ router.put('/:id', auth, authAdmin, sanitizeBody, async (req, res, next) => {
 router.delete('/:id', auth, authAdmin, async (req, res, next) => {
     try{
         const ingredient = await Ingredients.findByIdAndRemove(req.params.id)
-        if (!student) throw new ResourceNotFoundError('Resource not found')
+        if (!ingredient) throw new ResourceNotFoundError('Resource not found')
         res.send({ data: ingredient})
     } catch (err) {
         next(err)
