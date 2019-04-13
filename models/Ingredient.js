@@ -9,4 +9,4 @@ const schema = new mongoose.Schema({
   categories: [{type: String, trim: true, lowercase:true, enum: ['meat', 'spicy', 'vegitarian', 'vegan', 'halal', 'kosher', 'cheese', 'seasonings' ]}] // NEED FURTHER WORK!!!!
 })
 
-module.exports = mongoose.model('Ingredients', schema)
+module.exports = mongoose.model('Ingredient', schema)

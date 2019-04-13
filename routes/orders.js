@@ -3,29 +3,39 @@ const Orders = require('../models/Order')
 const authAdmin = require('../middleware/authorization')
 const express = require('express')
 const router = express.Router()
+const ResourceNotFoundError = require('../exceptions/ResourceNotFound')
 
-router.get('/', async (req, res) => {
-    const orders = await Orders.find().populate('customer').populate('pizzas')
-    res.send({ data: orders })
-})
 
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try{
-        const order = await Orders.findById(req.params.id).populate('customer').populate('pizzas')
-        if(!order) throw new Error('Resource not found')
-        res.send({ data: order })
-    } catch (err){
-        sendResourceNotFound(req, res)
+        const orders = await Orders.find().populate('customer').populate('pizzas')
+        res.send({ data: orders })
+    } catch(err){
+        next(err)
     }
 })
 
-router.post('/', authAdmin, sanitizeBody, async (req, res) => {
-    const newOrder = new Orders(req.sanitizeBody)
-    await newOrder.save()
-    res.send({ data: newOrder })
+router.get('/:id', async (req, res, next) => {
+    try{
+        const order = await Orders.findById(req.params.id).populate('customer').populate('pizzas')
+        if(!order) throw new ResourceNotFoundError('Resource not found')
+        res.send({ data: order })
+    } catch (err){
+        next(err)
+    }
 })
 
-router.patch('/:id', authAdmin, sanitizeBody, async (req, res) =>{
+router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
+    try{
+        const newOrder = new Orders(req.sanitizedBody)
+        await newOrder.save()
+        res.send({ data: newOrder })
+    } catch(err){
+        next(err)
+    }
+})
+
+router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) =>{
     try{
         const {_id, ...otherAttributes} = req.sanitizedBody
         const order = await Orders.findByIdAndUpdate(
@@ -38,14 +48,14 @@ router.patch('/:id', authAdmin, sanitizeBody, async (req, res) =>{
                 runValidators: true
             }
         )
-        if (!order) throw new Error('Resource not found')
+        if (!order) throw new ResourceNotFoundError('Resource not found')
         res.send({data: order})
     } catch (err){
-        sendResourceNotFound(req, res)
+        next(err)
     }
 })
 
-router.put('/:id', authAdmin, sanitizeBody,async (req, res) => {
+router.put('/:id', authAdmin, sanitizeBody,async (req, res, next) => {
     try{
         const {_id, ...otherAttributes} = req.sanitizedBody
         const order = await Orders.findByIdAndUpdate(
@@ -57,34 +67,21 @@ router.put('/:id', authAdmin, sanitizeBody,async (req, res) => {
                 runValidators: true
             }
         )
-        if (!order) throw new Error('Resource not found')
+        if (!order) throw new ResourceNotFoundError('Resource not found')
         res.send({ data: order})
     } catch (err) {
-        sendResourceNotFound(req, res)
+        next(err)
     }
 })
 
-router.delete('/:id', authAdmin, async (req, res) => {
+router.delete('/:id', authAdmin, async (req, res, next) => {
     try {
         const order = await Orders.findByIdAndRemove(req.params.id)
-        if (!order) throw new Error('Resource not found')
+        if (!order) throw new ErrResourceNotFoundErroror('Resource not found')
         res.send({data: order})
     } catch (err) {
-        sendResourceNotFound(req, res)
+        next(err)        
     }
 })
-
-function sendResourceNotFound(req, res) {
-    res.status(404).send({
-        errors: [
-            {
-                status: 'Not Found',
-                code: '404',
-                title: 'Resource does not exist',
-                description: `We could not find a order with id: ${req.params.id}`
-            }
-        ]
-    })
-}
 
 module.exports = router

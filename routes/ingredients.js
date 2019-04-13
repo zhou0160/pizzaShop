@@ -3,35 +3,45 @@ const Ingredients = require('../models/Ingredient')
 const authAdmin = require('../middleware/authorization')
 const express = require('express')
 const router = express.Router()
+const ResourceNotFoundError = require('../exceptions/ResourceNotFound')
 
-router.get('/', async (req, res) => {
-    const ingredients = await Ingredients.find()
-    res.send({ data: ingredients })
-})
-
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try{
-        let ingredients = await Ingredients.findById(req.params.id)
+        let ingredients = await Ingredients.find()
         if(req.query.instock){
             ingredients = ingredients.filter(ingredient => ingredient.quantity > 0)
         }
-        if(!ingredients) throw new Error('Resource not found')
-        res.send({ data: ingredients})
-
-    } catch (err) {
-        sendResourceNotFound(req, res)
+        res.send({ data: ingredients })
+    }catch (err){
+        next(err)
     }
 })
 
-router.post('/', authAdmin, sanitizeBody, async (req, res) => {
-    const newIngredient = new Ingredients(req.santizedBody)
-    await newIngredient.save()
-    res.status(201).send({ data: newIngredient })
+router.get('/:id', async (req, res,next) => {
+    try{
+        const ingredient = await Ingredients.findById(req.params.id)
+
+        if(!ingredient) throw new ResourceNotFoundError('Resource not found')
+        res.send({ data: ingredient})
+
+    } catch (err) {
+        next(err)
+    }
 })
 
-router.patch('/:id', authAdmin, sanitizeBody, async (req, res) => {
+router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
     try{
-        const {_id, ... otherAttributes} = req.santizedBody
+        const newIngredient = new Ingredients(req.sanitizedBody)
+        await newIngredient.save()
+        res.status(201).send({ data: newIngredient })
+    }catch(err){
+        next(err)
+    }
+})
+
+router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
+    try{
+        const {_id, ... otherAttributes} = req.sanitizedBody
         const ingredient = await Ingredients.findByIdAndUpdate(
             req.params.id,
             {
@@ -42,16 +52,16 @@ router.patch('/:id', authAdmin, sanitizeBody, async (req, res) => {
                 runValidators: true
             }
         )
-        if (!ingredient) throw new Error('Resource not found')
+        if (!ingredient) throw new ResourceNotFoundError('Resource not found')
         res.send({ data: student })
     } catch (err){
-        sendResourceNotFound(req, res)
+        next(err)
     }
 })
 
-router.put('/:id', authAdmin, sanitizeBody, async (req, res) => {
+router.put('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
     try{
-        const {_id, ...otherAttributes} = req.santizedBody
+        const {_id, ...otherAttributes} = req.sanitizedBody
         const ingredient = await Ingredients.findByIdAndUpdate(
             req.params.id,
             {
@@ -63,34 +73,21 @@ router.put('/:id', authAdmin, sanitizeBody, async (req, res) => {
                 runValidators: true
             }
         )
-        if (!ingredient) throw new Error('Resource not found')
+        if (!ingredient) throw new ResourceNotFoundError('Resource not found')
         res.send({ data: ingredient })
     } catch (err) {
-        sendResourceNotFound(req, res)
+        next(err)
     }
 })
 
-router.delete('/:id', authAdmin, async (req, res) => {
+router.delete('/:id', authAdmin, async (req, res, next) => {
     try{
         const ingredient = await Ingredients.findByIdAndRemove(req.params.id)
-        if (!student) throw new Error('Resource not found')
+        if (!student) throw new ResourceNotFoundError('Resource not found')
         res.send({ data: ingredient})
     } catch (err) {
-        sendResourceNotFound(req, res)
+        next(err)
     }
 })
-
-function sendResourceNotFound(req, res){
-    res.status(404).send({
-        errors: [
-            {
-                status: 'Not Found',
-                code: '404',
-                title: 'Resource does not exist',
-                description: `We could not find a ingredient with id: ${req.params.id}`
-            }
-        ]
-    })
-}
 
 module.exports = router
