@@ -1,5 +1,6 @@
 const sanitizeBody = require('../middleware/sanitizeBody')
 const Ingredients = require('../models/Ingredient')
+const auth = require('../middleware/auth')
 const authAdmin = require('../middleware/authorization')
 const express = require('express')
 const router = express.Router()
@@ -29,7 +30,7 @@ router.get('/:id', async (req, res,next) => {
     }
 })
 
-router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
+router.post('/', auth, authAdmin, sanitizeBody, async (req, res, next) => {
     try{
         const newIngredient = new Ingredients(req.sanitizedBody)
         await newIngredient.save()
@@ -39,7 +40,7 @@ router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
     }
 })
 
-router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
+router.patch('/:id', auth, authAdmin, sanitizeBody, async (req, res, next) => {
     try{
         const {_id, ... otherAttributes} = req.sanitizedBody
         const ingredient = await Ingredients.findByIdAndUpdate(
@@ -59,7 +60,7 @@ router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
     }
 })
 
-router.put('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
+router.put('/:id', auth, authAdmin, sanitizeBody, async (req, res, next) => {
     try{
         const {_id, ...otherAttributes} = req.sanitizedBody
         const ingredient = await Ingredients.findByIdAndUpdate(
@@ -80,7 +81,7 @@ router.put('/:id', authAdmin, sanitizeBody, async (req, res, next) => {
     }
 })
 
-router.delete('/:id', authAdmin, async (req, res, next) => {
+router.delete('/:id', auth, authAdmin, async (req, res, next) => {
     try{
         const ingredient = await Ingredients.findByIdAndRemove(req.params.id)
         if (!student) throw new ResourceNotFoundError('Resource not found')

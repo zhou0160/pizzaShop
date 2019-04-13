@@ -1,5 +1,6 @@
 const sanitizeBody = require('../middleware/sanitizeBody')
 const Pizzas = require('../models/Pizza')
+const auth = require('../middleware/auth')
 const authAdmin = require('../middleware/authorization')
 const express = require('express')
 const ResourceNotFoundError = require('../exceptions/ResourceNotFound')
@@ -34,7 +35,7 @@ router.get('/:id', async (req, res, next) => {
     }
 })
 
-router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
+router.post('/', auth, authAdmin, sanitizeBody, async (req, res, next) => {
     try{
         const newPizza = new Pizzas(req.sanitizedBody)
         await newPizza.save()
@@ -44,7 +45,7 @@ router.post('/', authAdmin, sanitizeBody, async (req, res, next) => {
     }
 })
 
-router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) =>{
+router.patch('/:id', auth, authAdmin, sanitizeBody, async (req, res, next) =>{
     try{
         const {_id, ...otherAttributes} = req.sanitizedBody
         const pizza = await Pizzas.findByIdAndUpdate(
@@ -64,7 +65,7 @@ router.patch('/:id', authAdmin, sanitizeBody, async (req, res, next) =>{
     }
 })
 
-router.put('/:id', authAdmin, sanitizeBody,async (req, res, next) => {
+router.put('/:id', auth, authAdmin, sanitizeBody,async (req, res, next) => {
     try{
         const {_id, ...otherAttributes} = req.sanitizedBody
         const pizza = await Pizzas.findByIdAndUpdate(
@@ -83,7 +84,7 @@ router.put('/:id', authAdmin, sanitizeBody,async (req, res, next) => {
     }
 })
 
-router.delete('/:id', authAdmin, async (req, res, next) => {
+router.delete('/:id', auth, authAdmin, async (req, res, next) => {
     try {
         const pizza = await Pizzas.findByIdAndRemove(req.params.id)
         if (!pizza) throw new ResourceNotFoundError('Resource not found')

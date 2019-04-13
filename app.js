@@ -12,9 +12,9 @@ app.use(require('express-mongo-sanitize')())
 
 app.use('/auth', require('./routes/auth/index'))
 
-app.use(require('./middleware/auth'))
 app.use('/api/pizzas', require('./routes/pizzas'))
 app.use('/api/ingredients', require('./routes/ingredients'))
+app.use('/api/orders', require('./middleware/auth'))
 app.use('/api/orders', require('./routes/orders'))
 
 app.use(require('./middleware/logErrors'))

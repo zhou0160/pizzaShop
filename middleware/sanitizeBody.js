@@ -14,7 +14,7 @@ const stripTages = payload => {
         _id,
         ...attributes
     } = payload
-    
+
     for (let key in attributes) {
         if (attributes[key] instanceof Array) {
             attributes[key] = attributes[key].map(element => {
@@ -31,9 +31,10 @@ const stripTages = payload => {
 }
 
 module.exports = (req, res, next) => {
-
+    // console.log(req.body) 
     const sanitizedBody = stripTages(req.body)
     req.sanitizedBody = sanitizedBody
+    console.log(sanitizedBody) 
 
     next()
 }
