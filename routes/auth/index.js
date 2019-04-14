@@ -6,7 +6,8 @@ const Authentication_attempts = require('../../models/Authentication_attempts')
 const authorization = require('../../middleware/authorization')
 
 router.post('/users', sanitizeBody, async (req, res, next) => {
-    new User(req.sanitizedBody)
+    const {isStaff, ...restBody} = req.sanitizedBody
+    new User(restBody)
     .save()
     .then(newUser => res.status(201).send({data: newUser}))
     .catch(next)
