@@ -1,9 +1,17 @@
 const mongoose = require('mongoose')
+const config = require('config')
 const debug = require('debug')('final:db')
 
 module.exports = () => {
+    const db = config.get('db')
+    let credentials = ''
+    if (process.env.NODE_ENV === 'production') {
+    credentials = `${db.username}:${db.password}@`
+    }
+    const connectionString = `mongodb://${credentials}${db.host}:${db.port}/${db.name}?authSource=admin`
+
     mongoose
-    .connect(`mongodb://localhost:27017/mad9124`, {useNewUrlParser: true})
+    .connect(connectionString,{useNewUrlParser: true})
     .then(() => {
       debug(`Connected to MongoDB ...`)
     })
