@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
 
 schema.pre('save', async function(){
     await this.populate('ingredients extraToppings').execPopulate()
-    this.price = [...this.ingredients, ...this.extraToppings].reduce((acc, item) => acc += item.price, 0)
+    this.price = this.price + [...this.ingredients, ...this.extraToppings].reduce((acc, item) => acc += item.price, 0)
 })
 
 module.exports = mongoose.model('Pizza', schema)
