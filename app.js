@@ -20,5 +20,5 @@ app.use('/api/orders', require('./routes/orders'))
 app.use(require('./middleware/logErrors'))
 app.use(require('./middleware/errorHandler'))
 
-const port = process.env.PORT || 3030
+const port = process.env.PORT || 80
 app.listen(port, () => debug(`Express is listening on port ${port} ...`))
