@@ -7,7 +7,7 @@ const ResourceNotFoundError = require('../exceptions/ResourceNotFound')
 const User = require('../models/User')
 
 
-router.use(require('./middleware/auth'))
+router.use(require('../middleware/auth'))
 
 
 router.get('/', async (req, res, next) => {
