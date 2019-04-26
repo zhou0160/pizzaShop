@@ -7,6 +7,9 @@ const ResourceNotFoundError = require('../exceptions/ResourceNotFound')
 const User = require('../models/User')
 
 
+router.use(require('./middleware/auth'))
+
+
 router.get('/', async (req, res, next) => {
     try {
         let user = await User.findById(req.user._id)
