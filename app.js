@@ -7,7 +7,7 @@ const debug = require('debug')('final')
 const express = require('express')
 const app = express()
 
-app.use(require('cors'))
+app.use(require('cors')())
 app.use(express.json())
 app.use(require('express-mongo-sanitize')())
 
